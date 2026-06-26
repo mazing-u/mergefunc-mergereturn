@@ -1,6 +1,3 @@
-#include <stdio.h>
-#define MAX 100
-
 int probnaFunkcija1() {
     int x;
     
@@ -50,4 +47,6 @@ int main() {
     int n = probnaFunkcija1();
     float m = probnaFunkcija2();
     probnaFunkcija3();
+
+    return 0;
 }
