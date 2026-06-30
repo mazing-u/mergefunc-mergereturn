@@ -10,7 +10,6 @@
 #include "llvm/Pass.h"
 #include "llvm/Support/raw_ostream.h"
 #include <numeric>
-
 using namespace llvm;
 
 namespace {
@@ -48,7 +47,6 @@ struct FunctionComparator {
     if (I1->getOpcode() != I2->getOpcode()) 
         return false;
     if (I1->getNumOperands() != I2->getNumOperands()) 
-; RUN: opt -passes=mergefunc -S < %s | FileCheck %s
         return false;
     if (I1->getType() != I2->getType()) 
         return false;
@@ -87,9 +85,12 @@ struct FunctionComparator {
   }
 
   bool equal() const {
-    if (F1->getFunctionType() != F2->getFunctionType()) return false;
-    if (F1->getCallingConv()  != F2->getCallingConv())  return false;
-    if (F1->size()            != F2->size())            return false;
+    if (F1->getFunctionType() != F2->getFunctionType()) 
+      return false;
+    if (F1->getCallingConv() != F2->getCallingConv())  
+      return false;
+    if (F1->size() != F2->size())          
+      return false;
 
     auto BB1 = F1->begin(), BB2 = F2->begin();
     for (auto E1 = F1->end(); BB1 != E1; ++BB1, ++BB2) {
@@ -135,7 +136,6 @@ void replaceWithThunk(Function *Old, Function *Canonical) {
   else
     Builder.CreateRet(CI);
 
-  Old->setLinkage(GlobalValue::PrivateLinkage);
 }
 
 static bool isThunk(const Function &F) {
@@ -154,6 +154,8 @@ static bool runOnce(Module &M) {
   DenseMap<uint64_t, SmallVector<Function *, 4>> Buckets;
   for (Function &F : M) {
     if (F.isDeclaration() || F.isIntrinsic() || F.empty())
+      continue;
+    if (F.hasAddressTaken()) 
       continue;
     if (F.isVarArg())
       continue;
